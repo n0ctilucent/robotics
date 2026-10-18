@@ -1,0 +1,27 @@
+KiCad creates and uses files of several different formats.[1]
+
+    Files that end in ".sch" are schematics.
+    Files that end in ".lib" are schematic symbols library files.
+    Files that end in "-cache.lib" are schematic symbols library files, too. This file is a local copy of symbols used in the current project the file is named for.
+    Files that end in ".pro" are project files
+    Files that end in ".dcm" add documentation to symbols in the library file with the same name. The ".dcm" file contains the description, keywords and docfilename whereas the ".lib" file contains information about how the symbol is drawn, the pins et cetera.
+
+    Files that end in ".000", ".bak", ".bck" are old backup files (don't archive them).
+
+    Files that end in ".brd" are PCB layout files.
+
+    Files that end in ".cmp" are footprint information files that are modified by the PCBNew program
+    Files that end in ".erc" are output from the schematic electronic rules check (ERC).
+    Files that end in ".gcd" ...
+    Files that end in ".lst", ".net" are netlist output from the schematic (don't archive them).
+
+    Files that end in ".kicad_mod", typically in folders with names that end in ".pretty", are the 2014(?) version of modules (a KiCad "module" is called a "footprint" or a "decal" in other CAD software), one footprint per file, lots of files in the entire ".pretty" library.
+
+    Files that end in ".mod" are module libraries (a KiCad "module" is called a "footprint" or a "decal" in other CAD software)
+    Files that end in ".mdc" cache a short summary of a few frequently-referenced bits of data from the corresponding ".mod" file of the same name (don't archive them).
+
+    Files that end in ".dsn" are regenerated from the ".kicad_pcb" file every time you hit the "autoroute" button and then hit the "Export a Specctra Design (*.dsn) file" (don't archive them).
+
+    Files that end in ".ses" are session files output from the autorouter (don't archive them).
+
+    The ".git" folder contains data for revision control. (If you use ".git" with KiCad,

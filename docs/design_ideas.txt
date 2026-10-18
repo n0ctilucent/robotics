@@ -1,0 +1,16 @@
+# design
+
+- add some gum drop LED to flash for reasons
+
+## motor control
+
+- Iot motor control via phone app
+- Adafruit 16-Channel 12-bit PWM/Servo Driver, I2C interface, PCA9685, Product ID 815
+
+## LCD screens
+
+use I2C
+
+## accelerometer
+
+## gps unit

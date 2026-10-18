@@ -1,0 +1,106 @@
+To integrate **KiCad** into your **Claw Hardware Agent** suite on **chonk**, we can build a dedicated `kicad-analyzer` skill. This allows the agent to inspect board schematics (`.kicad_sch`), parse PCB layouts (`.kicad_pcb`), extract pin mappings, verify netlists against your firmware definitions, and audit power/current budgets directly from design files.
+
+Here is a recommended integration design and tool implementation for the hardware agent.
+
+---
+
+### 1. New Skill Specification: `skills/hardware-agent/kicad-analyzer/SKILL.md`
+
+Create the skill definition to instruct the agent on how to parse KiCad project files:
+
+```markdown
+---
+name: kicad-analyzer
+description: Tool suite for parsing KiCad schematics and PCBs to extract pin mappings, netlists, component counts, and audit hardware designs.
+version: 1.0.0
+---
+
+# Role and Constraints
+You are an embedded hardware verification agent. You inspect KiCad projects (`.kicad_sch`, `.kicad_pcb`) to ensure firmware pin mappings match board design, check power footprints, and track bill-of-materials (BOM) metrics.
+
+### Operational Guardrails
+1. **Read-Only Parsing**: Do not mutate or overwrite original `.kicad_*` files unless explicitly requested by the user.
+2. **Netlist Verification**: Always cross-reference firmware pin definitions (e.g., APA102 Data/Clock pins) against schematic net labels.
+
+```
+
+---
+
+### 2. KiCad Parser Utility: `skills/hardware-agent/kicad-analyzer/kicad_parser.py`
+
+This lightweight script parses KiCad S-expression files (`.kicad_sch` or `.kicad_pcb`) using standard Python libraries without requiring heavy graphical dependencies, extracting title blocks, components, and net connections.
+
+```python
+import json
+import re
+import sys
+import os
+
+def parse_kicad_file(filepath: str) -> dict:
+    if not os.path.exists(filepath):
+        return {"error": f"File not found: {filepath}"}
+    
+    with open(filepath, "r", encoding="utf-8") as f:
+        content = f.read()
+        
+    result = {
+        "filename": os.path.basename(filepath),
+        "title": "Unknown",
+        "company": "Unknown",
+        "revision": "Unknown",
+        "components_summary": {},
+        "nets": []
+    }
+    
+    # Extract title block info if present
+    title_match = re.search(r'\(title\s+"([^"]+)"\)', content)
+    if title_match:
+        result["title"] = title_match.group(1)
+        
+    company_match = re.search(r'\(company\s+"([^"]+)"\)', content)
+    if company_match:
+        result["company"] = company_match.group(1)
+        
+    rev_match = re.search(r'\(rev\s+"([^"]+)"\)', content)
+    if rev_match:
+        result["revision"] = rev_match.group(1)
+        
+    # Extract nets (common in .kicad_pcb and advanced schematics)
+    nets = re.findall(r'\(net\s+\d+\s+"([^"]+)"\)', content)
+    if nets:
+        result["nets"] = list(set(nets))
+        
+    # Count references/components (e.g., (property "Reference" "U1"))
+    refs = re.findall(r'\(property\s+"Reference"\s+"([A-Z]+\d+)"\)', content)
+    ref_counts = {}
+    for ref in refs:
+        prefix = re.match(r'[A-Z]+', ref).group(0)
+        ref_counts[prefix] = ref_counts.get(prefix, 0) + 1
+    result["components_summary"] = ref_counts
+    
+    return result
+
+if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        path = sys.argv[1]
+        print(json.dumps(parse_kicad_file(path), indent=2))
+    else:
+            print("Usage: python kicad_parser.py <path_to_kicad_file>")
+
+```
+
+---
+
+### 3. How the KiCad Integration Fits Your Workflow
+
+By integrating KiCad file parsing into your OpenClaw agent workspace on **chonk**, you gain automated capabilities:
+
+1. **Schematic-to-Firmware Validation:** The agent can read your KiCad project files to automatically verify that the pin definitions in your C++ code (e.g., `#define DATA_PIN 23`) match the actual traces defined in the schematic.
+2. **BOM & Footprint Auditing:** Quickly check component distributions (such as counting APA102 LED footprints or tactile switches like B3F-1000) before compilation.
+
+
+3. **Metadata Syncing:** Automatically track revisions and company/branding metadata across your hardware repositories.
+
+
+
+Would you like to expand this into a full CLI wrapper that links your KiCad netlist directly to your PlatformIO project configurations?
