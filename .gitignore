@@ -138,3 +138,4 @@ libtool
 config.in
 po/
 stamp-h1
+src/wifi_config.h

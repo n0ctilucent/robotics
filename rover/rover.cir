@@ -1,0 +1,10 @@
+.title KiCad schematic
+U1 __U1
+BT2 __BT2
+BT5 __BT5
+BT3 __BT3
+BT1 __BT1
+BT4 __BT4
+U2 __U2
+J1 __J1
+.end

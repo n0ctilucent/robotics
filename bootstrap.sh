@@ -10,7 +10,7 @@ DEB_PKG=(imx500 libgpiod-dev)
 LRED=$(tput setaf 1)
 
 function main() {
-  figlet -f "${HOME}/workspace/fonts/figlet/pagga" workspace && echo -e "\n"
+  figlet -f "${HOME}/workspace/fonts/figlet/pagga" scrappy the robot && echo -e "\n"
   if [ -f "${HOME}/bin/common.sh" ]; then
     source "${HOME}/bin/common.sh"
   else
